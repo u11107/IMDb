@@ -6,6 +6,8 @@ import android.net.NetworkCapabilities
 import com.example.imdb.data.NetworkClient
 import com.example.imdb.data.dto.MoviesSearchRequest
 import com.example.imdb.data.dto.Response
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

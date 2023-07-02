@@ -1,5 +1,6 @@
 package com.example.imdb.ui.movies
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.imdb.util.Creator
 import com.example.imdb.ui.movies.adapter.MoviesAdapter
 import com.example.imdb.R
+import com.example.imdb.domain.models.Movie
 import com.example.imdb.presentation.movies.MoviesView
 import com.example.imdb.ui.poster.PosterActivity
 
@@ -75,8 +77,7 @@ class MoviesActivity : Activity(), MoviesView {
             }
         )
         textWatcher?.let { queryInput.addTextChangedListener(it) }
-
-
+        moviesSearchPresenter.onCreate()
     }
 
     override fun onDestroy() {
@@ -108,5 +109,12 @@ class MoviesActivity : Activity(), MoviesView {
 
     override fun changePlaceholderText(newPlaceholderText: String) {
         placeholderMessage.text = newPlaceholderText
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    override fun updateMoviesList(newMoviesList: List<Movie>) {
+        adapter.movies.clear()
+        adapter.movies.addAll(newMoviesList)
+        adapter.notifyDataSetChanged()
     }
 }

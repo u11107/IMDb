@@ -20,11 +20,13 @@ class MoviesSearchPresenter(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private val SEARCH_REQUEST_TOKEN = Any()
     }
 
-    private val movies = ArrayList<Movie>()
 
     private val moviesInteractor = Creator.provideMoviesInteractor(context)
+
+    private val movies = ArrayList<Movie>()
     private val handler = Handler(Looper.getMainLooper())
 
     private var lastSearchText: String? = null
@@ -40,6 +42,14 @@ class MoviesSearchPresenter(
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
+    fun onCreate() {
+        adapter.movies = movies
+    }
+
+    fun onDestroy() {
+        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+    }
+
     private fun searchRequest(newSearchText: String) {
         if (newSearchText.isNotEmpty()) {
             view.showPlaceholderMessage(false)
@@ -47,21 +57,20 @@ class MoviesSearchPresenter(
             view.showProgressBar(true)
 
             moviesInteractor.searchMovies(newSearchText, object : MoviesInteractor.MoviesConsumer {
-                @SuppressLint("NotifyDataSetChanged")
                 override fun consume(foundMovies: List<Movie>?, errorMessage: String?) {
                     handler.post {
                         view.showProgressBar(false)
                         if (foundMovies != null) {
+
+                            // Обновляем список на экране
                             movies.clear()
                             movies.addAll(foundMovies)
-                            adapter.notifyDataSetChanged()
+                            view.updateMoviesList(movies)
                             view.showMoviesList(true)
                         }
                         if (errorMessage != null) {
-                            // Поменяли view на Context
                             showMessage(context.getString(R.string.something_went_wrong), errorMessage)
                         } else if (movies.isEmpty()) {
-                            // И здесь поменяли view на Context
                             showMessage(context.getString(R.string.nothing_found), "")
                         } else {
                             hideMessage()
@@ -72,15 +81,16 @@ class MoviesSearchPresenter(
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun showMessage(text: String, additionalMessage: String) {
         if (text.isNotEmpty()) {
             view.showPlaceholderMessage(true)
+
+            // Обновляем список на экране
             movies.clear()
-            adapter.notifyDataSetChanged()
+            view.updateMoviesList(movies)
+
             view.changePlaceholderText(text)
             if (additionalMessage.isNotEmpty()) {
-                // Поменяли view на Context
                 Toast.makeText(context, additionalMessage, Toast.LENGTH_LONG)
                     .show()
             }

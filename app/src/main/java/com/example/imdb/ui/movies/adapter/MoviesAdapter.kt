@@ -1,7 +1,9 @@
-package com.example.imdb
+package com.example.imdb.ui.movies.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.imdb.ui.movies.holder.MovieViewHolder
+import com.example.imdb.domain.models.Movie
 
 class MoviesAdapter(val clickListener: MovieClickListener) : RecyclerView.Adapter<MovieViewHolder>() {
 
@@ -10,8 +12,8 @@ class MoviesAdapter(val clickListener: MovieClickListener) : RecyclerView.Adapte
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder = MovieViewHolder(parent)
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        holder.bind(movies.get(position))
-        holder.itemView.setOnClickListener { clickListener.onMovieClick(movies.get(position)) }
+        holder.bind(movies[position])
+        holder.itemView.setOnClickListener { clickListener.onMovieClick(movies[position]) }
     }
 
     override fun getItemCount(): Int = movies.size
